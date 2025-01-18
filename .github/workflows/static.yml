@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Stacking Game</title>
+  <!-- Import THREE.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Import GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/EasePack.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    #game {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+    }
+    #container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 20px;
+      color: #fff;
+      z-index: 1000;
+    }
+    #start-button {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background: #000;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    #instructions {
+      position: absolute;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 16px;
+      color: #fff;
+      z-index: 1000;
+    }
+    .hide {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="container">
+      <div id="score">0</div>
+      <div id="instructions">Press Spacebar or Click to Stack Blocks</div>
+      <div id="start-button">Start</div>
+    </div>
+  </div>
+
+  <script>
+    // Your JavaScript code starts here
+    console.clear();
+    var Stage = /** @class */ (function () {
+      function Stage() {
+        // container
+        var _this = this;
+        this.render = function () {
+          this.renderer.render(this.scene, this.camera);
+        };
+        this.add = function (elem) {
+          this.scene.add(elem);
+        };
+        this.remove = function (elem) {
+          this.scene.remove(elem);
+        };
+        this.container = document.getElementById("game");
+        // renderer
+        this.renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          alpha: false,
+        });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setClearColor("#D0CBC7", 1);
+        this.container.appendChild(this.renderer.domElement);
+        // scene
+        this.scene = new THREE.Scene();
+        // camera
+        var aspect = window.innerWidth / window.innerHeight;
+        var d = 20;
+        this.camera = new THREE.OrthographicCamera(
+          -d * aspect,
+          d * aspect,
+          d,
+          -d,
+          -100,
+          1000
+        );
+        this.camera.position.x = 2;
+        this.camera.position.y = 2;
+        this.camera.position.z = 2;
+        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+        // light
+        this.light = new THREE.DirectionalLight(0xffffff, 0.5);
+        this.light.position.set(0, 499, 0);
+        this.scene.add(this.light);
+        this.softLight = new THREE.AmbientLight(0xffffff, 0.4);
+        this.scene.add(this.softLight);
+        window.addEventListener("resize", function () {
+          return _this.onResize();
+        });
+        this.onResize();
+      }
+      Stage.prototype.setCamera = function (y, speed) {
+        if (speed === void 0) {
+          speed = 0.3;
+        }
+        gsap.to(this.camera.position, {
+          duration: speed,
+          y: y + 4,
+          ease: "power1.inOut",
+        });
+        gsap.to(this.camera.lookAt, { duration: speed, y: y, ease: "power1.inOut" });
+      };
+      Stage.prototype.onResize = function () {
+        var viewSize = 30;
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.camera.left = window.innerWidth / -viewSize;
+        this.camera.right = window.innerWidth / viewSize;
+        this.camera.top = window.innerHeight / viewSize;
+        this.camera.bottom = window.innerHeight / -viewSize;
+        this.camera.updateProjectionMatrix();
+      };
+      return Stage;
+    })();
+    // Add the Block and Game class code here (truncated for brevity)
+    var game = new Game();
+  </script>
+</body>
+</html>
